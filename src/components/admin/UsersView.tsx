@@ -1,6 +1,10 @@
 import { User, UserPlus, Edit, Trash2 } from 'lucide-react';
 
-export function UsersView() {
+interface UsersViewProps {
+  onTabChange?: (tab: string) => void;
+}
+
+export function UsersView({ onTabChange }: UsersViewProps = {}) {
   // Sample user data - in a real app, this would come from an API
   const users = [
     {

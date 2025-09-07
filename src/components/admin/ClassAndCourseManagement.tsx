@@ -3,7 +3,11 @@ import { Users, BookOpen } from 'lucide-react';
 import ClassManagement from './ClassManagement';
 import CourseManagement from './CourseManagement';
 
-export default function ClassAndCourseManagement() {
+interface ClassAndCourseManagementProps {
+  onTabChange?: (tab: string) => void;
+}
+
+export default function ClassAndCourseManagement({ onTabChange }: ClassAndCourseManagementProps = {}) {
   const [activeTab, setActiveTab] = useState<'classes' | 'courses'>('classes');
 
   return (

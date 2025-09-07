@@ -22,6 +22,10 @@ export default function AdminDashboard() {
         return <AnnouncementCenter />;
       case 'communication':
         return <CommunicationCenter />;
+      case 'reports':
+      case 'calendar':
+        // TODO: Implémenter les composants ReportsView et CalendarView
+        return <div className="p-6">Fonctionnalité en cours de développement</div>;
       case 'settings':
         return <AdminSettings />;
       default:

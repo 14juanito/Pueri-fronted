@@ -50,7 +50,11 @@ function ActivityItem({ title, time, message, isNew = false }: {
   );
 }
 
-export function DashboardView() {
+interface DashboardViewProps {
+  onTabChange: (tab: string) => void;
+}
+
+export function DashboardView({ onTabChange }: DashboardViewProps) {
   const [timeRange, setTimeRange] = useState('7 derniers jours');
   
   return (
@@ -119,7 +123,10 @@ export function DashboardView() {
         <div className="space-y-4">
           <h2 className="text-lg font-medium text-gray-900">Actions rapides</h2>
           <div className="space-y-3">
-            <button className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => onTabChange('users')}
+              className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="p-2 rounded-lg bg-brand/10 text-brand">
                 <UserPlus className="h-5 w-5" />
               </div>
@@ -129,7 +136,10 @@ export function DashboardView() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => onTabChange('communication')}
+              className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
                 <MessageSquare className="h-5 w-5" />
               </div>
@@ -139,7 +149,10 @@ export function DashboardView() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => onTabChange('classes')}
+              className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="p-2 rounded-lg bg-green-100 text-green-600">
                 <BookOpen className="h-5 w-5" />
               </div>
@@ -149,7 +162,10 @@ export function DashboardView() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => onTabChange('reports')}
+              className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
                 <FileText className="h-5 w-5" />
               </div>
@@ -159,7 +175,10 @@ export function DashboardView() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button 
+              onClick={() => onTabChange('calendar')}
+              className="w-full flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <div className="p-2 rounded-lg bg-yellow-100 text-yellow-600">
                 <Calendar className="h-5 w-5" />
               </div>
