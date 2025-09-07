@@ -5,6 +5,7 @@ import { UsersView } from '../components/admin/UsersView';
 import ClassAndCourseManagement from '../components/admin/ClassAndCourseManagement';
 import AdminSettings from '../components/admin/AdminSettings';
 import AnnouncementCenter from '../components/admin/AnnouncementCenter';
+import { CommunicationCenter } from '../components/admin/CommunicationCenter';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,6 +20,8 @@ export default function AdminDashboard() {
         return <UsersView />;
       case 'announcements':
         return <AnnouncementCenter />;
+      case 'communication':
+        return <CommunicationCenter />;
       case 'settings':
         return <AdminSettings />;
       default:
@@ -35,6 +38,8 @@ export default function AdminDashboard() {
       case 'users':
         return 'Gestion des utilisateurs';
       case 'announcements':
+        return 'Annonces';
+      case 'communication':
         return 'Centre de communication';
       case 'settings':
         return 'Paramètres';
