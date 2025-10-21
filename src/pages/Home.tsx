@@ -339,7 +339,7 @@ export default function Home() {
 function SchoolGallery() {
   // Available school images
   const images = [
-    { src: '/p-1.jpeg', alt: 'Élèves en classe', category: 'Vie scolaire' },
+    { src: '/p-1.jpeg', alt: 'Élèves en pleine cour', category: 'Vie scolaire' },
     { src: '/p-2.jpeg', alt: 'Cérémonie de remise des prix', category: 'Événements' },
     { src: '/p-3.jpeg', alt: 'Sortie éducative', category: 'Sorties scolaires' },
     { src: '/p-4.jpeg', alt: 'Atelier créatif', category: 'Activités' },

@@ -1,20 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// Composants UI
 import { Button } from '@/components/ui/button';
-import { Loader2, Users, BookOpen, FileText, Calendar, MessageSquare, Bell } from 'lucide-react';
+import { Loader2, Users, BookOpen, FileText, Calendar } from 'lucide-react';
+
+// Hooks et services
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
-import { toast } from '@/components/ui/use-toast';
 
-type StatsType = {
+// Types
+interface StatsType {
   totalStudents: number;
   totalTeachers: number;
   totalClasses: number;
   totalAssignments: number;
   unreadMessages: number;
   unreadNotifications: number;
-};
+}
+
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: any;
+  config: any;
+  request?: any;
+}
+
 
 export default function AdminDashboard() {
   const { user, hasPermission, logout } = useAuth();
@@ -29,37 +41,27 @@ export default function AdminDashboard() {
       try {
         setIsLoading(true);
         // En production, ces appels pourraient être combinés en un seul endpoint
-        const [
-          studentsRes, 
-          teachersRes, 
-          classesRes, 
-          assignmentsRes,
-          messagesRes,
-          notificationsRes
-        ] = await Promise.all([
-          api.get('/eleves/count/'),
-          api.get('/utilisateurs/count/?role=TEACHER'),
-          api.get('/classes/count/'),
-          api.get('/devoirs/count/'),
-          api.get('/messages/non_lus/count/'),
-          api.get('/notifications/non_lues/count/')
+        const responses = await Promise.all([
+          api.get<{ count: number }>('/eleves/count/'),
+          api.get<{ count: number }>('/utilisateurs/count/?role=TEACHER'),
+          api.get<{ count: number }>('/classes/count/'),
+          api.get<{ count: number }>('/devoirs/count/'),
+          api.get<{ count: number }>('/messages/non_lus/count/'),
+          api.get<{ count: number }>('/notifications/non_lues/count/')
         ]);
 
         setStats({
-          totalStudents: studentsRes.data.count,
-          totalTeachers: teachersRes.data.count,
-          totalClasses: classesRes.data.count,
-          totalAssignments: assignmentsRes.data.count,
-          unreadMessages: messagesRes.data.count,
-          unreadNotifications: notificationsRes.data.count,
+          totalStudents: responses[0].count,
+          totalTeachers: responses[1].count,
+          totalClasses: responses[2].count,
+          totalAssignments: responses[3].count,
+          unreadMessages: responses[4].count,
+          unreadNotifications: responses[5].count,
         });
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de charger les statistiques du tableau de bord.',
-          variant: 'destructive',
-        });
+        // Gérer l'erreur sans utiliser toast
+        console.error('Impossible de charger les statistiques du tableau de bord.');
       } finally {
         setIsLoading(false);
       }
@@ -73,28 +75,16 @@ export default function AdminDashboard() {
   // Gérer l'affectation automatique des subdivisions
   const handleAutoAssignSubdivisions = async () => {
     if (!hasPermission('ADMIN')) {
-      toast({
-        title: 'Accès refusé',
-        description: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.',
-        variant: 'destructive',
-      });
+      console.error('Accès refusé: auto_assign_subdivisions');
       return;
     }
 
     try {
       setIsProcessing(true);
-      await api.autoAssignSubdivisions();
-      toast({
-        title: 'Succès',
-        description: 'L\'affectation automatique des subdivisions a été effectuée avec succès.',
-      });
+      await api.post('/admin/auto-assign-subdivisions');
+      console.log('Attribution automatique des subdivisions réussie');
     } catch (error) {
-      console.error('Error assigning subdivisions:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de l\'affectation des subdivisions.',
-        variant: 'destructive',
-      });
+      console.error('Erreur lors de l\'attribution automatique des subdivisions:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -103,28 +93,16 @@ export default function AdminDashboard() {
   // Gérer le calcul des notes trimestrielles
   const handleCalculateTermGrades = async () => {
     if (!hasPermission('ADMIN')) {
-      toast({
-        title: 'Accès refusé',
-        description: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.',
-        variant: 'destructive',
-      });
+      console.error('Accès refusé: calculate_term_grades');
       return;
     }
 
     try {
       setIsProcessing(true);
-      await api.calculateTermGrades();
-      toast({
-        title: 'Succès',
-        description: 'Le calcul des notes trimestrielles a été effectué avec succès.',
-      });
+      await api.post('/admin/calculate-term-grades');
+      console.log('Calcul des moyennes de trimestre réussi');
     } catch (error) {
-      console.error('Error calculating term grades:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors du calcul des notes trimestrielles.',
-        variant: 'destructive',
-      });
+      console.error('Erreur lors du calcul des moyennes de trimestre:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -133,29 +111,16 @@ export default function AdminDashboard() {
   // Gérer la promotion automatique des élèves
   const handleAutoPromoteStudents = async () => {
     if (!hasPermission('ADMIN')) {
-      toast({
-        title: 'Accès refusé',
-        description: 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.',
-        variant: 'destructive',
-      });
+      console.error('Accès refusé: auto_promote_students');
       return;
     }
 
     try {
       setIsProcessing(true);
-      // Utiliser un seuil de 10/20 par défaut
-      await api.autoPromoteStudents(10);
-      toast({
-        title: 'Succès',
-        description: 'La promotion automatique des élèves a été effectuée avec succès.',
-      });
+      await api.post('/admin/auto-promote-students');
+      console.log('Promotion automatique des élèves réussie');
     } catch (error) {
-      console.error('Error promoting students:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la promotion automatique des élèves.',
-        variant: 'destructive',
-      });
+      console.error('Erreur lors de la promotion automatique des élèves:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -190,78 +155,105 @@ export default function AdminDashboard() {
 
       {/* Cartes de statistiques */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Élèves</CardTitle>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Élèves</h3>
             <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="mt-2">
             <div className="text-2xl font-bold">{stats?.totalStudents || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.totalStudents === 1 ? 'élève inscrit' : 'élèves inscrits'}
-            </p>
-          </CardContent>
-        </Card>
+            <p className="text-xs text-muted-foreground">Inscrits cette année</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Enseignants</CardTitle>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Enseignants</h3>
             <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="mt-2">
             <div className="text-2xl font-bold">{stats?.totalTeachers || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.totalTeachers === 1 ? 'enseignant' : 'enseignants'}
-            </p>
-          </CardContent>
-        </Card>
+            <p className="text-xs text-muted-foreground">Enseignants actifs</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Classes</CardTitle>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Classes</h3>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="mt-2">
             <div className="text-2xl font-bold">{stats?.totalClasses || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.totalClasses === 1 ? 'classe' : 'classes'}
-            </p>
-          </CardContent>
-        </Card>
+            <p className="text-xs text-muted-foreground">Classes actives</p>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Devoirs</CardTitle>
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium">Devoirs</h3>
             <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div className="mt-2">
             <div className="text-2xl font-bold">{stats?.totalAssignments || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.totalAssignments === 1 ? 'devoir' : 'devoirs'}
+            <p className="text-xs text-muted-foreground">Cette année scolaire</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border bg-card p-6 shadow-sm md:col-span-2">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Notifications récentes</h3>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/notifications')}>
+            Voir tout
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {stats && stats.unreadNotifications > 0 ? (
+            <div className="rounded-lg bg-blue-50 p-4">
+              <div className="flex items-start">
+                <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
+                  <span className="text-white text-xs font-medium">{stats.unreadNotifications}</span>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-blue-800">
+                    {stats.unreadNotifications} notification(s) non lue(s)
+                  </p>
+                  <p className="text-sm text-blue-700">
+                    Consultez vos notifications pour les détails
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aucune nouvelle notification
             </p>
-          </CardContent>
-        </Card>
+          )}
+        </div>
       </div>
 
       {/* Actions rapides */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Actions Administratives</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button 
-              variant="outline" 
+        <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <h3 className="mb-4 text-lg font-semibold">Actions Administratives</h3>
+          <div className="space-y-2">
+            <Button
+              variant="outline"
               className="w-full justify-start"
               onClick={handleAutoAssignSubdivisions}
               disabled={isProcessing}
             >
               {isProcessing ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <div className="flex items-center justify-center py-2">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Traitement en cours...
+                </div>
               ) : (
-                <Users className="mr-2 h-4 w-4" />
+                <div className="flex items-center">
+                  <Users className="mr-2 h-4 w-4" />
+                  Affecter automatiquement les subdivisions
+                </div>
               )}
-              Affecter automatiquement les subdivisions
             </Button>
             
             <Button 
@@ -271,11 +263,16 @@ export default function AdminDashboard() {
               disabled={isProcessing}
             >
               {isProcessing ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <div className="flex items-center justify-center py-2">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Traitement en cours...
+                </div>
               ) : (
-                <FileText className="mr-2 h-4 w-4" />
+                <div className="flex items-center">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Calculer les moyennes de trimestre
+                </div>
               )}
-              Calculer les notes trimestrielles
             </Button>
             
             <Button 
@@ -285,68 +282,69 @@ export default function AdminDashboard() {
               disabled={isProcessing}
             >
               {isProcessing ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <div className="flex items-center justify-center py-2">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Traitement en cours...
+                </div>
               ) : (
-                <Users className="mr-2 h-4 w-4" />
+                <div className="flex items-center">
+                  <Users className="mr-2 h-4 w-4" />
+                  Promouvoir automatiquement les élèves
+                </div>
               )}
-              Promouvoir automatiquement les élèves
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Notifications récentes</CardTitle>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Section Notifications */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Notifications récentes</h3>
               <Button variant="ghost" size="sm" onClick={() => navigate('/notifications')}>
                 Voir tout
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {stats?.unreadNotifications ? (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4 p-3 bg-muted/50 rounded-md">
-                  <div className="flex-shrink-0">
-                    <Bell className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">
-                      Vous avez {stats.unreadNotifications} notification{stats.unreadNotifications > 1 ? 's' : ''} non lue{stats.unreadNotifications > 1 ? 's' : ''}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Consultez vos notifications pour ne rien manquer
-                    </p>
+            <div className="space-y-4">
+              {stats && stats.unreadNotifications > 0 ? (
+                <div className="rounded-lg bg-blue-50 p-4">
+                  <div className="flex items-start">
+                    <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
+                      <span className="text-white text-xs font-medium">{stats.unreadNotifications}</span>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-blue-800">
+                        {stats.unreadNotifications} notification(s) non lue(s)
+                      </p>
+                      <p className="text-sm text-blue-700">
+                        Consultez vos notifications pour les détails
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <Bell className="mx-auto h-8 w-8 mb-2 opacity-30" />
-                <p>Aucune nouvelle notification</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Aucune nouvelle notification
+                </p>
+              )}
+            </div>
+          </div>
 
-      {/* Prochaines échéances */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Prochaines échéances</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/calendrier')}>
-              Voir le calendrier
-            </Button>
+          {/* Section Prochaines échéances */}
+          <div className="rounded-lg border bg-card p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Prochaines échéances</h3>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/calendrier')}>
+                Voir le calendrier
+              </Button>
+            </div>
+            <div className="text-center py-6 text-muted-foreground">
+              <Calendar className="mx-auto h-8 w-8 mb-2 opacity-30" />
+              <p>Aucune échéance à venir cette semaine</p>
+            </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            <Calendar className="mx-auto h-8 w-8 mb-2 opacity-30" />
-            <p>Aucune échéance à venir cette semaine</p>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

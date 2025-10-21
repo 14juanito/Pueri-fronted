@@ -1,7 +1,21 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { useAuth } from '../stores/auth';
-import type { UserRole } from '../types';
+import type { 
+  User, 
+  UserRole, 
+  Student, 
+  Class, 
+  Subject, 
+  Assignment, 
+  Grade, 
+  SchoolYear, 
+  Term, 
+  Period, 
+  Message, 
+  Notification, 
+  Timetable 
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 

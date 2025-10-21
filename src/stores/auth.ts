@@ -1,20 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-export type Role = 'ADMIN' | 'TEACHER' | 'PARENT'
-
-type User = {
-  name: string
-  email: string
-  role: Role
-}
+import type { User, UserRole } from '../types'
 
 type AuthState = {
   user: User | null
   isAuthenticated: boolean
   login: (user: User) => void
   logout: () => void
-  updateProfile: (data: Partial<Pick<User, 'name' | 'email'>>) => void
+  updateProfile: (data: Partial<Pick<User, 'firstName' | 'lastName' | 'email'>>) => void
 }
 
 export const useAuth = create<AuthState>()(
@@ -22,12 +15,30 @@ export const useAuth = create<AuthState>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      login: (user) => set({ user, isAuthenticated: true }),
+      login: (userData) => set({ 
+        user: {
+          id: userData.id,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          role: userData.role,
+          isActive: userData.isActive,
+          createdAt: userData.createdAt,
+          updatedAt: userData.updatedAt
+        }, 
+        isAuthenticated: true 
+      }),
       logout: () => set({ user: null, isAuthenticated: false }),
       updateProfile: (data) => {
         const u = get().user
         if (!u) return
-        set({ user: { ...u, ...data } })
+        set({ 
+          user: { 
+            ...u, 
+            ...data,
+            updatedAt: new Date().toISOString()
+          } 
+        })
       },
     }),
     { name: 'pueri-angeli-auth' }

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth as useAuthStore } from '../stores/auth';
 import { api } from '../services/api';
-import type { User, UserRole } from '../types';
+import type { UserRole } from '../types';
 
 export function useAuth() {
   const { user, isAuthenticated, login: loginStore, logout: logoutStore, updateProfile: updateProfileStore } = useAuthStore();
@@ -25,6 +25,9 @@ export function useAuth() {
         firstName: userData.firstName,
         lastName: userData.lastName,
         role: userData.role,
+        isActive: userData.isActive,
+        createdAt: userData.createdAt,
+        updatedAt: userData.updatedAt
       });
       
       // Rediriger vers le tableau de bord approprié
@@ -73,12 +76,14 @@ export function useAuth() {
    * Met à jour le profil de l'utilisateur
    */
   const updateProfile = useCallback(async (data: { firstName?: string; lastName?: string; email?: string }) => {
+    if (!user) return { success: false, error: 'Not authenticated' };
+    
     try {
-      const updatedUser = await api.updateProfile(data);
+      await api.updateProfile(data);
       updateProfileStore({
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        email: updatedUser.email,
+        firstName: data.firstName || user.firstName,
+        lastName: data.lastName || user.lastName,
+        email: data.email || user.email,
       });
       return { success: true };
     } catch (error) {
