@@ -339,16 +339,18 @@ export default function Home() {
 function SchoolGallery() {
   // Available school images
   const images = [
-    { src: '/img-1-pueri.png', alt: 'Élèves en classe' },
-    { src: '/logo.png', alt: 'Logo de l\'école' },
-    // Add more images as they become available
+    { src: '/p-1.jpeg', alt: 'Élèves en classe', category: 'Vie scolaire' },
+    { src: '/p-2.jpeg', alt: 'Cérémonie de remise des prix', category: 'Événements' },
+    { src: '/p-3.jpeg', alt: 'Sortie éducative', category: 'Sorties scolaires' },
+    { src: '/p-4.jpeg', alt: 'Atelier créatif', category: 'Activités' },
+    { src: '/p-5.jpeg', alt: 'Cours en plein air', category: 'Enseignement' }
   ]
 
   // Duplicate for seamless marquee
-  const loop = [...images, ...images, ...images]
+  const loop = [...images, ...images]
 
   return (
-    <div className="relative overflow-hidden py-8">
+    <div id="gallery" className="relative overflow-hidden py-12 bg-gray-50">
       <motion.h2 
         className="mb-8 text-center text-3xl font-bold text-gray-800"
         initial={{ opacity: 0, y: 20 }}
@@ -360,22 +362,24 @@ function SchoolGallery() {
       </motion.h2>
       
       <div className="relative overflow-hidden">
-        <div className="flex w-[300%] animate-[marquee-right_30s_linear_infinite] hover:animation-pause">
+        <div className="flex w-[200%] animate-marquee hover:animation-pause">
           {loop.map((img, i) => (
-            <div key={i} className="w-1/3 shrink-0 px-2 sm:w-1/4 md:w-1/5 lg:w-1/6">
+            <div key={i} className="w-[200px] flex-shrink-0 px-2">
               <motion.div 
-                className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md"
+                className="group relative h-48 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md sm:h-56"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
                 <img 
                   src={img.src} 
                   alt={img.alt} 
-                  className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-110 sm:h-56 md:h-64" 
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                    <p className="text-sm font-medium">{img.alt}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-sm font-medium text-white">{img.alt}</p>
+                    <p className="text-xs text-gray-200">{img.category}</p>
                   </div>
                 </div>
               </motion.div>
@@ -386,7 +390,12 @@ function SchoolGallery() {
       
       <div className="mt-8 text-center">
         <Link 
-          to="/gallery"
+          to="#"
+          onClick={(e) => {
+            e.preventDefault();
+            // Scroll to gallery section
+            document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' });
+          }}
           className="inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-3 font-medium text-white transition-colors hover:bg-brand/90"
         >
           Voir toute la galerie

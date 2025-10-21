@@ -6,9 +6,11 @@ import ClassAndCourseManagement from '../components/admin/ClassAndCourseManageme
 import AdminSettings from '../components/admin/AdminSettings';
 import AnnouncementCenter from '../components/admin/AnnouncementCenter';
 import { CommunicationCenter } from '../components/admin/CommunicationCenter';
+import { Gallery } from '@/components/gallery/Gallery';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -34,10 +36,21 @@ export default function AdminDashboard() {
   };
 
   return (
-    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
-      <div className="space-y-6">
-        {renderContent()}
-      </div>
-    </AdminLayout>
+    <>
+      <AdminLayout 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        onOpenGallery={() => setIsGalleryOpen(true)}
+      >
+        <div className="space-y-6">
+          {renderContent()}
+        </div>
+      </AdminLayout>
+      
+      <Gallery 
+        isOpen={isGalleryOpen} 
+        onClose={() => setIsGalleryOpen(false)} 
+      />
+    </>
   );
 }

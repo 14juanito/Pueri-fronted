@@ -1,13 +1,14 @@
 import type { ReactNode } from 'react';
-import { Home, BookOpen, Users, Settings, LogOut } from 'lucide-react';
+import { Home, BookOpen, Users, Settings, LogOut, Image as ImageIcon } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: ReactNode;
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onOpenGallery: () => void;
 }
 
-export function AdminLayout({ children, activeTab, onTabChange }: AdminLayoutProps) {
+export function AdminLayout({ children, activeTab, onTabChange, onOpenGallery }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Top Navigation */}
@@ -46,6 +47,18 @@ export function AdminLayout({ children, activeTab, onTabChange }: AdminLayoutPro
                   active={activeTab === 'settings'}
                   onClick={() => onTabChange('settings')}
                 />
+                
+                <div className="border-t border-gray-200 pt-4 mt-4">
+                  <button
+                    onClick={onOpenGallery}
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-left hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <div className="flex items-center">
+                      <ImageIcon className="mr-3 h-6 w-6 text-gray-500 group-hover:text-gray-600" />
+                      Galerie photos
+                    </div>
+                  </button>
+                </div>
               </nav>
               
               <div className="pt-4 border-t border-black/10">
